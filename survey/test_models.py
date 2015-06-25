@@ -18,4 +18,23 @@ class ModeTests(TestCase):
 
 class LegTests(TestCase):
 
-    pass
+    def setUp(self):
+        models.Mode.objects.create(name="bike", met=50.0,
+                                   carb=0.0, speed=20.0, green=True)
+        bike = models.Mode.objects.get(name='bike')
+        mode.Leg(mode=bike, duration=20, day='w')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
