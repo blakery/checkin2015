@@ -22,6 +22,7 @@ class AlertErrorList(ErrorList):
             return (u'<div class="alert alert-danger dangerous" '
                     'role="alert">%s</div>' % error)
 
+
 class CommuterForm(ModelForm):
     class Meta:
         model = Commutersurvey
@@ -65,6 +66,7 @@ class CommuterForm(ModelForm):
         self.fields['email'].error_messages['required'] = (
             'Please enter an email address.')
 
+
 class ExtraCommuterForm(ModelForm):
     class Meta:
         model = Commutersurvey
@@ -72,7 +74,6 @@ class ExtraCommuterForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ExtraCommuterForm, self).__init__(*args, **kwargs)
-
         self.fields['share'].label = (
             "Please don't share my identifying information with my employer")
         self.fields['comments'].label = "Add a comment"
@@ -82,7 +83,6 @@ class ExtraCommuterForm(ModelForm):
         self.fields['comments'].widget.attrs['placeholder'] = (
             "We'd love to hear from you!")
         self.fields['comments'].widget.attrs['rows'] = 2
-
         # add CSS classes for bootstrap
         self.fields['share'].widget.attrs['class'] = 'form-control'
         self.fields['comments'].widget.attrs['class'] = 'form-control'
@@ -95,6 +95,7 @@ class RequiredFormSet(BaseInlineFormSet):
             form.empty_permitted = False
             form.error_class = AlertErrorList
 
+
 #FIXME: LegForms 1 2 3 and 4 should all be a single class
 class LegForm1(ModelForm):
 
@@ -104,10 +105,8 @@ class LegForm1(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(LegForm1, self).__init__(*args, **kwargs)
-
         self.fields['mode'].label = "How you traveled"
         self.fields['duration'].label = "Time in minutes"
-
         self.fields['mode'].widget.attrs['class'] = 'form-control'
         self.fields['duration'].widget.attrs['class'] = 'form-control'
         self.fields['day'].initial = 'n'
@@ -120,6 +119,7 @@ class LegForm1(ModelForm):
             'Please tell us how you traveled.')
         self.fields['mode'].required = False
         self.fields['duration'].required = False
+
 
 class LegForm2(ModelForm):
 
@@ -129,10 +129,8 @@ class LegForm2(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(LegForm2, self).__init__(*args, **kwargs)
-
         self.fields['mode'].label = "How you traveled"
         self.fields['duration'].label = "Time in minutes"
-
         self.fields['mode'].widget.attrs['class'] = 'form-control'
         self.fields['duration'].widget.attrs['class'] = 'form-control'
         self.fields['day'].initial = 'n'
@@ -146,6 +144,7 @@ class LegForm2(ModelForm):
         self.fields['mode'].required = False
         self.fields['duration'].required = False
 
+
 class LegForm3(ModelForm):
 
     class Meta:
@@ -154,10 +153,8 @@ class LegForm3(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(LegForm3, self).__init__(*args, **kwargs)
-
         self.fields['mode'].label = "How you traveled"
         self.fields['duration'].label = "Time in minutes"
-
         self.fields['mode'].widget.attrs['class'] = 'form-control'
         self.fields['duration'].widget.attrs['class'] = 'form-control'
         self.fields['day'].initial = 'w'
@@ -169,6 +166,7 @@ class LegForm3(ModelForm):
         self.fields['mode'].error_messages['required'] = (
             'Please tell us how you traveled.')
 
+
 class LegForm4(ModelForm):
 
     class Meta:
@@ -177,10 +175,8 @@ class LegForm4(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(LegForm4, self).__init__(*args, **kwargs)
-
         self.fields['mode'].label = "How you traveled"
         self.fields['duration'].label = "Time in minutes"
-
         self.fields['mode'].widget.attrs['class'] = 'form-control'
         self.fields['duration'].widget.attrs['class'] = 'form-control'
         self.fields['day'].initial = 'w'
@@ -195,7 +191,8 @@ class LegForm4(ModelForm):
         self.fields['duration'].required = False
 
 
-MakeLegs_WRTW = inlineformset_factory(Commutersurvey, Leg, form=LegForm3, extra=1, max_num=10, can_delete=True)
+MakeLegs_WRTW = inlineformset_factory(Commutersurvey, Leg, form=LegForm3,
+                                      extra=1, max_num=10, can_delete=True)
 MakeLegs_WRFW = inlineformset_factory(Commutersurvey, Leg, form=LegForm4,
                                       extra=1, max_num=10, can_delete=True)
 MakeLegs_NormalTW = inlineformset_factory(Commutersurvey, Leg, form=LegForm1,
