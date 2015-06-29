@@ -1,9 +1,7 @@
 from __future__ import division
 from django.db import models
 from django.core.validators import MaxValueValidator
-
 import datetime
-from datetime import date
 from smart_selects.db_fields import ChainedForeignKey
 
 
@@ -44,7 +42,7 @@ class Employer(models.Model):
     def percent_participation(self):
         """Calculates and returns the percentage of employees participating"""
         elapsed_months = Month.objects.filter(
-            wr_day__year='2015', open_checkin__lte=date.today()).count()
+            wr_day__year='2015', open_checkin__lte=datetime.date.today()).count()
         return Commutersurvey.objects.filter(employer=self).count() / \
             (self.nr_employees * elapsed_months)
 
