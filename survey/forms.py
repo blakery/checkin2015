@@ -18,10 +18,10 @@ class AlertErrorList(ErrorList):
         if not self:
             return u''
         #FIXME: will this even work as intended?
+        message = ''
         for error in self:
-            return (u'<div class="alert alert-danger dangerous" '
-                    'role="alert">%s</div>' % error)
-
+            message += u'<div class="alert alert-danger dangerous" role="alert">{}</div>'.format(error)
+        return message
 
 class CommuterForm(ModelForm):
     class Meta:
