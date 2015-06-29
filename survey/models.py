@@ -1,8 +1,7 @@
 from __future__ import division
 from django.db import models
-from django.db.models import Sum
 from django.core.validators import MaxValueValidator
-# unused import: MinValueValidator
+
 import datetime
 from datetime import date
 from smart_selects.db_fields import ChainedForeignKey
@@ -159,7 +158,8 @@ class Commutersurvey(models.Model):
     contact = models.BooleanField("Contact me", default=False)
     volunteer = models.BooleanField('Available to volunteer', default=False)
     created = models.DateTimeField(auto_now_add=True)
-    # calculated changes between normal day and walk/ride day
+    # calculated changes between normal day and walk/ride day. 
+    # this should proabably also be changed to something besides string tuples
     CHANGE_CHOICES = (
         ('p', 'Positive change'),
         ('g', 'Green change'),
@@ -241,7 +241,7 @@ class Commutersurvey(models.Model):
         """Returns the total amount of calories burned due to wrday"""
         wr_day_calories = 0.0
         wr_day_calories = self.leg_set.only('calories').filter(
-            day='w').aggregate(Sum('calories'))['calories__sum']
+            day='w').aggregate(models.Sum('calories'))['calories__sum']
         return wr_day_calories
 
 
@@ -271,8 +271,7 @@ class Mode(models.Model):
 
 class Leg(models.Model):
     """representation for part of a commute"""
-    #FIXME: these look like they want to be enums
-    # right now they look like bad C code
+    # looks like this is the proscribed format for defining choices in django
     LEG_DIRECTIONS = (
         ('tw', 'to work'),
         ('fw', 'from work'),
@@ -281,7 +280,6 @@ class Leg(models.Model):
         ('w', 'Walk/Ride Day'),
         ('n', 'Normal day'),
     )
-
     mode = models.ForeignKey('Mode')
     duration = models.PositiveSmallIntegerField(
         default=5, validators=[MaxValueValidator(1440)]) #ensures legs < a day
