@@ -280,8 +280,17 @@ class Commutersurvey(models.Model):
         legs = self.leg_set.only('carbon', 'day').all()
         for leg in legs:
             if leg.day == 'n':
-                car_speed = Mode.objects.get(name="Driving alone").speed
-                car_carbon = Mode.objects.get(name="Driving alone").carb/1000
+                # if there is no entry named "Driving alone", 
+                # this will get a reasonable value instead
+                car_speed = 40
+                #fixme this number is arbitrary
+                car_carbon = 9000         
+                try:
+                    car_mode = Mode.objects.get(name="Driving alone")
+                    car_speed = car_mode.speed
+                    car_carbon = car_mode.carb/1000
+                except:
+                    pass
                 carbon = car_carbon * car_speed * leg.duration/60
                 normal_car_carbon += carbon
             elif leg.day == 'w':
