@@ -96,100 +96,51 @@ class RequiredFormSet(BaseInlineFormSet):
             form.error_class = AlertErrorList
 
 
-#FIXME: LegForms 1 2 3 and 4 should all be a single class
-class LegForm1(ModelForm):
-
+class LegForm(ModelForm):
     class Meta:
         model = Leg
         fields = ['mode', 'duration', 'day', 'direction']
 
+    def __init__(self, *args, **kwargs):
+        super(LegForm, self).__init__(*args, **kwargs)
+        self.fields['mode'].label = "How you traveled"
+        self.fields['duration'].label = "Time in minutes"
+        self.fields['mode'].widget.attrs['class'] = 'form-control'
+        self.fields['duration'].widget.attrs['class'] = 'form-control'
+        self.fields['day'].widget = HiddenInput()
+        self.fields['direction'].widget = HiddenInput()
+        self.fields['duration'].error_messages['max_value'] = (
+            'Did you really travel a whole day?')
+        self.fields['mode'].error_messages['required'] = (
+            'Please tell us how you traveled.')
+        self.fields['mode'].required = False
+        self.fields['duration'].required = False
+        
+
+#FIXME: LegForms 1 2 3 and 4 should all be a single class
+class LegForm1(LegForm):
     def __init__(self, *args, **kwargs):
         super(LegForm1, self).__init__(*args, **kwargs)
-        self.fields['mode'].label = "How you traveled"
-        self.fields['duration'].label = "Time in minutes"
-        self.fields['mode'].widget.attrs['class'] = 'form-control'
-        self.fields['duration'].widget.attrs['class'] = 'form-control'
+        self.fields['direction'].initial = 'tw'        
         self.fields['day'].initial = 'n'
-        self.fields['direction'].initial = 'tw'
-        self.fields['day'].widget = HiddenInput()
-        self.fields['direction'].widget = HiddenInput()
-        self.fields['duration'].error_messages['max_value'] = (
-            'Did you really travel a whole day?')
-        self.fields['mode'].error_messages['required'] = (
-            'Please tell us how you traveled.')
-        self.fields['mode'].required = False
-        self.fields['duration'].required = False
-
 
 class LegForm2(ModelForm):
-
-    class Meta:
-        model = Leg
-        fields = ['mode', 'duration', 'day', 'direction']
-
     def __init__(self, *args, **kwargs):
         super(LegForm2, self).__init__(*args, **kwargs)
-        self.fields['mode'].label = "How you traveled"
-        self.fields['duration'].label = "Time in minutes"
-        self.fields['mode'].widget.attrs['class'] = 'form-control'
-        self.fields['duration'].widget.attrs['class'] = 'form-control'
-        self.fields['day'].initial = 'n'
         self.fields['direction'].initial = 'fw'
-        self.fields['day'].widget = HiddenInput()
-        self.fields['direction'].widget = HiddenInput()
-        self.fields['duration'].error_messages['max_value'] = (
-            'Did you really travel a whole day?')
-        self.fields['mode'].error_messages['required'] = (
-            'Please tell us how you traveled.')
-        self.fields['mode'].required = False
-        self.fields['duration'].required = False
+        self.fields['day'].initial = 'n'
 
-
-class LegForm3(ModelForm):
-
-    class Meta:
-        model = Leg
-        fields = ['mode', 'duration', 'day', 'direction']
-
+class LegForm3(LegForm):
     def __init__(self, *args, **kwargs):
         super(LegForm3, self).__init__(*args, **kwargs)
-        self.fields['mode'].label = "How you traveled"
-        self.fields['duration'].label = "Time in minutes"
-        self.fields['mode'].widget.attrs['class'] = 'form-control'
-        self.fields['duration'].widget.attrs['class'] = 'form-control'
-        self.fields['day'].initial = 'w'
         self.fields['direction'].initial = 'tw'
-        self.fields['day'].widget = HiddenInput()
-        self.fields['direction'].widget = HiddenInput()
-        self.fields['duration'].error_messages['max_value'] = (
-            'Did you really travel a whole day?')
-        self.fields['mode'].error_messages['required'] = (
-            'Please tell us how you traveled.')
+        self.fields['day'].initial = 'w'
 
-
-class LegForm4(ModelForm):
-
-    class Meta:
-        model = Leg
-        fields = ['mode', 'duration', 'day', 'direction']
-
+class LegForm4(LegForm):
     def __init__(self, *args, **kwargs):
         super(LegForm4, self).__init__(*args, **kwargs)
-        self.fields['mode'].label = "How you traveled"
-        self.fields['duration'].label = "Time in minutes"
-        self.fields['mode'].widget.attrs['class'] = 'form-control'
-        self.fields['duration'].widget.attrs['class'] = 'form-control'
-        self.fields['day'].initial = 'w'
         self.fields['direction'].initial = 'fw'
-        self.fields['day'].widget = HiddenInput()
-        self.fields['direction'].widget = HiddenInput()
-        self.fields['duration'].error_messages['max_value'] = (
-            'Did you really travel a whole day?')
-        self.fields['mode'].error_messages['required'] = (
-            'Please tell us how you traveled.')
-        self.fields['mode'].required = False
-        self.fields['duration'].required = False
-
+        self.fields['day'].initial = 'w'
 
 MakeLegs_WRTW = inlineformset_factory(Commutersurvey, Leg, form=LegForm3,
                                       extra=1, max_num=10, can_delete=True)
@@ -199,6 +150,18 @@ MakeLegs_NormalTW = inlineformset_factory(Commutersurvey, Leg, form=LegForm1,
                                           extra=1, max_num=10, can_delete=True)
 MakeLegs_NormalFW = inlineformset_factory(Commutersurvey, Leg, form=LegForm2,
                                           extra=1, max_num=10, can_delete=True)
+
+def MakeLegs(kind):
+    """
+    LEG_DIRECTIONS = (
+        ('tw', 'to work'),
+        ('fw', 'from work'),
+    )
+    LEG_DAYS = (
+        ('w', 'Walk/Ride Day'),
+        ('n', 'Normal day'),
+    )"""
+
 
 class NormalFromWorkSameAsAboveForm(forms.Form):
     widget = forms.RadioSelect(choices=((True, 'YES'), (False, 'NO')))
