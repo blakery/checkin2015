@@ -39,30 +39,50 @@ class Employer(models.Model):
     def __unicode__(self):
         return unicode(self.name)
 
-    def percent_participation(self):
+    def percent_participation(self, shortmonth):
+        """Calculates and returns the percentage of employees participating"""
+        if shortmonth != 'all':
+            month_model = Month.objects.filter(wr_day__year='2015', wr_day__month=shortmonth)
+            percent = Commutersurvey.objects.filter(wr_day_month=month_model, employer=self).count() / self.nr_employees
+        else:
+            percent = Commutersurvey.objects.filter(employer=self).count() / self.nr_employees
+        return percent
+
+    def average_percent_participation(self):
         """Calculates and returns the percentage of employees participating"""
         elapsed_months = Month.objects.filter(
             wr_day__year='2015', open_checkin__lte=datetime.date.today()).count()
         return Commutersurvey.objects.filter(employer=self).count() / \
             (self.nr_employees * elapsed_months)
 
-    def percent_already_green(self):
+    def percent_already_green(self, shortmonth):
         """Calculates and returns the percentage of employees who
         already have a green commute
         """
-        surveys = Commutersurvey.objects.filter(employer=self)
+        if shortmonth != 'all':
+            month_model = Month.objects.filter(wr_day__year='2015', wr_day__month=shortmonth)
+            surveys = Commutersurvey.objects.filter(employer=self, wr_day_month=month_model)
+        else:
+            surveys = Commutersurvey.objects.filter(employer=self)
+
         already_green = surveys.filter(already_green=True).count()
+
         if surveys.count() > 0:
             percent = already_green / surveys.count()
         else:
             percent = 0.0
         return percent
 
-    def percent_green_switch(self):
+    def percent_green_switch(self, shortmonth):
         """
         Calculates and returns the % of employees who made a green switch
         """
-        surveys = Commutersurvey.objects.filter(employer=self)
+        if shortmonth != 'all':
+            month_model = Month.objects.filter(wr_day__year='2015', wr_day__month=shortmonth)
+            surveys = Commutersurvey.objects.filter(employer=self, wr_day_month=month_model)
+        else:
+            surveys = Commutersurvey.objects.filter(employer=self)
+
         green_switch = surveys.filter(change_type__in=['g', 'p']).count()
         if surveys.count() > 0:
             percent = green_switch / surveys.count()
@@ -70,11 +90,16 @@ class Employer(models.Model):
             percent = 0.0
         return percent
 
-    def percent_healthy_switch(self):
+    def percent_healthy_switch(self, shortmonth):
         """
         Calculates and returns the % of employees who made a healthy switch
         """
-        surveys = Commutersurvey.objects.filter(employer=self)
+        if shortmonth != 'all':
+            month_model = Month.objects.filter(wr_day__year='2015', wr_day__month=shortmonth)
+            surveys = Commutersurvey.objects.filter(employer=self, wr_day_month=month_model)
+        else:
+            surveys = Commutersurvey.objects.filter(employer=self)
+
         healthy_switch = surveys.filter(change_type__in=['h', 'p']).count()
         if surveys.count() > 0:
             percent = healthy_switch / surveys.count()
@@ -95,14 +120,30 @@ class Team(models.Model):
     def __unicode__(self):
         return unicode(self.name)
 
-    def percent_participation(self):
-        """percent of team participating in wrday"""
-        return Commutersurvey.objects.filter(team=self).distinct('email').\
-            count() / self.nr_members
+    def percent_participation(self, shortmonth):
+        """Calculates and returns the percentage of team employees participating"""
+        if shortmonth != 'all':
+            month_model = Month.objects.filter(wr_day__year='2015', wr_day__month=shortmonth)
+            percent = Commutersurvey.objects.filter(wr_day_month=month_model, team=self).count() / self.nr_members
+        else:
+            percent = Commutersurvey.objects.filter(team=self).count() / self.nr_members
+        return percent
 
-    def percent_already_green(self):
+    def average_percent_participation(self):
+        """Calculates and returns the percentage of team employees participating"""
+        elapsed_months = Month.objects.filter(
+            wr_day__year='2015', open_checkin__lte=date.today()).count()
+        return Commutersurvey.objects.filter(team=self).count() / \
+            (self.nr_members * elapsed_months)
+
+    def percent_already_green(self, shortmonth):
         """percent of commute already 'green' """
-        surveys = Commutersurvey.objects.filter(team=self)
+        if shortmonth != 'all':
+            month_model = Month.objects.filter(wr_day__year='2015', wr_day__month=shortmonth)
+            surveys = Commutersurvey.objects.filter(team=self, wr_day_month=month_model)
+        else:
+            surveys = Commutersurvey.objects.filter(team=self)
+
         already_green = surveys.filter(already_green=True).count()
         if surveys.count() > 0:
             percent = already_green / surveys.count()
@@ -110,9 +151,14 @@ class Team(models.Model):
             percent = 0.0
         return percent
 
-    def percent_green_switch(self):
+    def percent_green_switch(self, shortmonth):
         """change in 'greenness' of commute due to switch"""
-        surveys = Commutersurvey.objects.filter(team=self)
+        if shortmonth != 'all':
+            month_model = Month.objects.filter(wr_day__year='2015', wr_day__month=shortmonth)
+            surveys = Commutersurvey.objects.filter(team=self, wr_day_month=month_model)
+        else:
+            surveys = Commutersurvey.objects.filter(team=self)
+
         green_switch = surveys.filter(change_type__in=['g', 'p']).count()
         if surveys.count() > 0:
             percent = green_switch / surveys.count()
@@ -120,9 +166,14 @@ class Team(models.Model):
             percent = 0.0
         return percent
 
-    def percent_healthy_switch(self):
+    def percent_healthy_switch(self, shortmonth):
         """change in healthiness of commute due to switch"""
-        surveys = Commutersurvey.objects.filter(team=self)
+        if shortmonth != 'all':
+            month_model = Month.objects.filter(wr_day__year='2015', wr_day__month=shortmonth)
+            surveys = Commutersurvey.objects.filter(team=self, wr_day_month=month_model)
+        else:
+            surveys = Commutersurvey.objects.filter(team=self)
+
         healthy_switch = surveys.filter(change_type__in=['h', 'p']).count()
         if surveys.count() > 0:
             percent = healthy_switch / surveys.count()
@@ -176,6 +227,9 @@ class Commutersurvey(models.Model):
     carbon_savings = models.FloatField(blank=True, null=True, default=0.0)
     # calories burned on w/r day
     calories_total = models.FloatField(blank=True, null=True, default=0.0)
+
+    class Meta:
+        unique_together = ("email", "wr_day_month")
 
     def __unicode__(self):
         return unicode(self.id)
@@ -244,6 +298,14 @@ class Commutersurvey(models.Model):
 
 
     def save(self, *args, **kwargs):
+        """if there's an existing checkin for this month/email, delete that one and replace it with this checkin"""
+        existing_checkin = Commutersurvey.objects.filter(wr_day_month=self.wr_day_month, email=self.email)
+        if self.id:
+            # if this instance has already been saved we need to filter out this instance from our results.
+            existing_checkin = existing_checkin.exclude(pk=self.id)
+        if existing_checkin.exists():
+            existing_checkin.delete()
+
         """overwrites the save method in order to calculate all the data!"""
         changes = self.calculate_difference()
         self.carbon_change = changes["carbon"]

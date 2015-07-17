@@ -4,6 +4,14 @@ $(function() {
     width: "99%"
   });
 
+  // show message for those running IE 7 or lower
+  var isIE = document.all && !document.querySelector;
+  if (isIE) {
+    $('.browser').show();
+  } else {
+    $('.browser').hide();
+  }
+
   //make subteam dropdown required only when there are subteams populated
   $('#id_team').parent().parent().hide();
 
@@ -82,7 +90,7 @@ $(function() {
 
   // hide extra leg stuff at first
   $('.wr-day .from-work .legs-wrapper').hide();
-  $('.normal-day').hide();
+  $('.normal-legs').hide();
   $('.normal-day .from-work .legs-wrapper').hide();
 
   function clearLegData(selector) {
@@ -105,7 +113,7 @@ $(function() {
 
   // handles options for if the normal commute happens to be the same as the walk-ride day commute
   $('#id_normal_same_as_walkride input:radio').change(function() {
-    $('.normal-day').toggle({ start: function() {
+    $('.normal-legs').toggle({ start: function() {
       if ($(this).is(':visible')) { clearLegData($(this)); }}
     });
   });
