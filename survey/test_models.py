@@ -1,5 +1,27 @@
 from django.test import TestCase
 import models
+import datetime
+
+class MonthCreationTests(TestCase):
+
+    def test_default_month_values(self):
+        models.Month.objects.create(wr_day=datetime.date.today())
+        month = models.Month.objects.get(wr_day=datetime.date.today())
+        self.assertFalse(month.open_checkin)
+        self.assertFalse(month.close_checkin)
+        month.delete()
+
+    def test_create_month(self):
+        wr_date = datetime.date.today()
+        open_date = wr_date - datetime.timedelta(days=1)
+        close_date = wr_date + datetime.timedelta(days=1)
+        models.Month.objects.create(wr_day=datetime.date.today(),
+                                    open_checkin=open_date, 
+                                    close_checkin=close_date)
+        month = models.Month.objects.get(wr_day=datetime.date.today())
+        self.assertEqual(month.open_checkin, open_date)
+        self.assertEqual(month.close_checkin, close_date)
+        month.delete()
 
 
 class ModeCreationTests(TestCase):
@@ -13,8 +35,6 @@ class ModeCreationTests(TestCase):
         self.assertFalse(empty.met)
         empty.delete()
 
-
-
     def test_create_mode(self):
         models.Mode.objects.create(name="bike", met=50.0,
                                    carb=0.0, speed=20.0, green=True)
@@ -25,6 +45,7 @@ class ModeCreationTests(TestCase):
         self.assertEqual(bike.met, 50.0)
         self.assertTrue(bike.green)
         bike.delete()
+
 
 class EmployerTests(TestCase):
 
@@ -52,14 +73,19 @@ class CommuterSurveyTests(TestCase):
 
     def test_default_commutersurvey_values(self):
         pass
-    def test_create_commutersurvey(self):
-        """
-        name = ""
-        wr_day_month = models.Month.objects.get(a month)
-        home_address = ""
-        work_address = ""
-        email = ""
-        employer = models.Employer.objects.get(an employer)
-        """
+
+    def test_commutersurvey_fields(self):
+        name = "Somebody"
+        models.Month.objects.create(wr_day=datetime.date.today())
+        month = models.Month.objects.get(wr_day=datetime.date.today())
+        models.Employer.objects.create(name="Company Inc.", nr_employees=5000,
+                                       active2015=True)
+        employer = models.Employer.objects.get(name="Company Inc.")
+        email = "somebody@email.com"
+        home_address = "Somewhere Street"
+        work_address = "Somewhere Else Avenue"
+
+        
+
 
 
