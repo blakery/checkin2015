@@ -17,11 +17,12 @@ class AlertErrorList(ErrorList):
     def as_divs(self):
         if not self:
             return u''
-        #FIXME: will this even work as intended?
+        #FIXME: untested
+        err_list = ''
         for error in self:
-            return (u'<div class="alert alert-danger dangerous" '
+            err_list = err_list + (u'<div class="alert alert-danger dangerous" '
                     'role="alert">%s</div>' % error)
-
+        return err_list
 
 class CommuterForm(ModelForm):
     class Meta:
