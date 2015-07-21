@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from survey.models import Commutersurvey, Employer, Leg, Month
 from survey.forms import CommuterForm, ExtraCommuterForm
-from survey.forms import MakeLegs_NormalTW, MakeLegs_NormalFW, MakeLegs_WRTW, MakeLegs_WRFW
+from survey.forms import MakeLegs
 from survey.forms import NormalFromWorkSameAsAboveForm, WalkRideFromWorkSameAsAboveForm, NormalIdenticalToWalkrideForm
 
 import json
@@ -52,7 +52,7 @@ def plaintext_thankyou(date):
             'participation in {}\'s Walk/Ride Day! Feel free to '
             'show it to our Retail Partners to take advantage of '
             'their offers of freebies, discounts, and other goodies!'
-            ' Thank you for being involved! Remember to check-in for 
+            ' Thank you for being involved! Remember to check-in for '
             'next month\'s Walk/Ride Day. Warmly, Green Streets'
             ' Initiative'.format(date))
 
@@ -66,12 +66,10 @@ def add_checkin(request):
     except Month.DoesNotExist:
         return redirect('/')
 
-    leg_formset_NormalTW = MakeLegs_NormalTW(instance=Commutersurvey(),
-                                             prefix='ntw')
-    leg_formset_NormalFW = MakeLegs_NormalFW(instance=Commutersurvey(),
-                                             prefix='nfw')
-    leg_formset_WRTW = MakeLegs_WRTW(instance=Commutersurvey(), prefix='wtw')
-    leg_formset_WRFW = MakeLegs_WRFW(instance=Commutersurvey(), prefix='wfw')
+    leg_formset_NormalTW = MakeLegs(instance=Commutersurvey(), prefix='ntw')
+    leg_formset_NormalFW = MakeLegs(instance=Commutersurvey(), prefix='nfw')
+    leg_formset_WRTW = MakeLegs(instance=Commutersurvey(), prefix='wtw')
+    leg_formset_WRFW = MakeLegs(instance=Commutersurvey(), prefix='wfw')
 
     normal_copy = NormalFromWorkSameAsAboveForm(
         {'normal_same_as_reverse': True})
@@ -99,27 +97,27 @@ def add_checkin(request):
             commutersurvey.comments = extra_commute_form.cleaned_data['comments']
 
 
-            leg_formset_WRTW = MakeLegs_WRTW(
-                request.POST, instance=commutersurvey, prefix='wtw')
+            leg_formset_WRTW = MakeLegs(request.POST, prefix='wtw',
+                                        instance=commutersurvey)
 
             # time for convoluted logic!
             if request.POST['walkride_same_as_reverse']:
                 # set w/r legs from work = w/r legs to work
-                leg_formset_WRFW = MakeLegs_WRTW(
-                    request.POST, instance=commutersurvey, prefix='wtw')
+                leg_formset_WRFW = MakeLegs(request.POST, prefix='wtw',
+                                            instance=commutersurvey)
                 # need to correct for the hidden fields
                 for form in leg_formset_WRFW:
                     leg = form.save(commit=False)
                     leg.direction = 'fw'
             else:
                 # set w/r legs from work based on user input
-                leg_formset_WRFW = MakeLegs_WRFW(
-                    request.POST, instance=commutersurvey, prefix='wfw')
+                leg_formset_WRFW = MakeLegs(request.POST, prefix='wfw',
+                                            instance=commutersurvey)
 
             if request.POST['normal_same_as_walkride']:
                 # set normal legs to work = w/r legs to work
-                leg_formset_NormalTW = MakeLegs_WRTW(
-                    request.POST, instance=commutersurvey, prefix='wtw')
+                leg_formset_NormalTW = MakeLegs(request.POST, prefix='wtw', 
+                                                instance=commutersurvey)
                 # need to correct for the hidden fields
                 for form in leg_formset_NormalTW:
                     leg = form.save(commit=False)
@@ -129,8 +127,9 @@ def add_checkin(request):
                 if request.POST['walkride_same_as_reverse']:
                     # if w/r legs from work = w/r legs to work,
                     #use w/r legs to work to set normal legs from work
-                    leg_formset_NormalFW = MakeLegs_WRTW(
-                        request.POST, instance=commutersurvey, prefix='wtw')
+                    
+                    leg_formset_NormalFW = MakeLegs(request.POST, prefix='wtw', 
+                                                    instance=commutersurvey)
                     # need to correct for the hidden fields
                     for form in leg_formset_NormalFW:
                         leg = form.save(commit=False)
@@ -139,28 +138,28 @@ def add_checkin(request):
                 else:
                     # if w/r legs from work =/= w/r legs to work,
                     #use w/r legs from work to set normal legs from work
-                    leg_formset_NormalFW = MakeLegs_WRFW(
-                        request.POST, instance=commutersurvey, prefix='wfw')
+                    leg_formset_NormalFW = MakeLegs(request.POST, prefix='wfw', 
+                                                    instance=commutersurvey)
                     # need to correct for the hidden fields
                     for form in leg_formset_NormalFW:
                         leg = form.save(commit=False)
                         leg.day = 'n'
             else:
                 # set normal legs to work based on user input
-                leg_formset_NormalTW = MakeLegs_NormalTW(
-                    request.POST, instance=commutersurvey, prefix='ntw')
+                leg_formset_NormalTW = MakeLegs(request.POST, prefix='ntw',
+                                                instance=commutersurvey)
                 if request.POST['normal_same_as_reverse']:
                     # set normal legs from work = normal legs to work
-                    leg_formset_NormalFW = MakeLegs_NormalTW(
-                        request.POST, instance=commutersurvey, prefix='ntw')
+                    leg_formset_NormalFW = MakeLegs(request.POST, prefix='ntw',
+                                                    instance=commutersurvey)
                     # need to correct for the hidden fields
                     for form in leg_formset_NormalFW:
                         leg = form.save(commit=False)
                         leg.direction = 'fw'
                 else:
                     # set normal legs from work based on user input
-                    leg_formset_NormalFW = MakeLegs_NormalFW(
-                        request.POST, instance=commutersurvey, prefix='nfw')
+                    leg_formset_NormalFW = MakeLegs(request.POST, prefix='nfw',
+                                                    instance=commutersurvey)
 
             # finally! we're good to go.
             if (leg_formset_WRTW.is_valid() and

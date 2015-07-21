@@ -98,6 +98,8 @@ class RequiredFormSet(BaseInlineFormSet):
 
 
 class LegForm(ModelForm):
+    """
+    """
     class Meta:
         model = Leg
         fields = ['mode', 'duration', 'day', 'direction']
@@ -116,53 +118,12 @@ class LegForm(ModelForm):
             'Please tell us how you traveled.')
         self.fields['mode'].required = False
         self.fields['duration'].required = False
-        
+        #prefix will be a string in the form of ('w' | 'n') + ('fw' | 'tw')
+        self.fields['direction'].initial = self.prefix[1:]
+        self.fields['day'].initial = self.prefix[0]
 
-#FIXME: LegForms 1 2 3 and 4 should all be a single class
-class LegForm1(LegForm):
-    def __init__(self, *args, **kwargs):
-        super(LegForm1, self).__init__(*args, **kwargs)
-        self.fields['direction'].initial = 'tw'        
-        self.fields['day'].initial = 'n'
-
-class LegForm2(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(LegForm2, self).__init__(*args, **kwargs)
-        self.fields['direction'].initial = 'fw'
-        self.fields['day'].initial = 'n'
-
-class LegForm3(LegForm):
-    def __init__(self, *args, **kwargs):
-        super(LegForm3, self).__init__(*args, **kwargs)
-        self.fields['direction'].initial = 'tw'
-        self.fields['day'].initial = 'w'
-
-class LegForm4(LegForm):
-    def __init__(self, *args, **kwargs):
-        super(LegForm4, self).__init__(*args, **kwargs)
-        self.fields['direction'].initial = 'fw'
-        self.fields['day'].initial = 'w'
-
-MakeLegs_WRTW = inlineformset_factory(Commutersurvey, Leg, form=LegForm3,
+MakeLegs = inlineformset_factory(Commutersurvey, Leg, form=LegForm,
                                       extra=1, max_num=10, can_delete=True)
-MakeLegs_WRFW = inlineformset_factory(Commutersurvey, Leg, form=LegForm4,
-                                      extra=1, max_num=10, can_delete=True)
-MakeLegs_NormalTW = inlineformset_factory(Commutersurvey, Leg, form=LegForm1,
-                                          extra=1, max_num=10, can_delete=True)
-MakeLegs_NormalFW = inlineformset_factory(Commutersurvey, Leg, form=LegForm2,
-                                          extra=1, max_num=10, can_delete=True)
-
-def MakeLegs(kind):
-    """
-    LEG_DIRECTIONS = (
-        ('tw', 'to work'),
-        ('fw', 'from work'),
-    )
-    LEG_DAYS = (
-        ('w', 'Walk/Ride Day'),
-        ('n', 'Normal day'),
-    )"""
-
 
 class NormalFromWorkSameAsAboveForm(forms.Form):
     widget = forms.RadioSelect(choices=((True, 'YES'), (False, 'NO')))
